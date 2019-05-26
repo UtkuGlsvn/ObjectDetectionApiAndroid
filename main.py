@@ -1,7 +1,7 @@
 # @Author: utkuglsvn <glsvn>
 # @Date:   2019-05-22T16:46:15+03:00
 # @Last modified by:   glsvn
-# @Last modified time: 2019-05-24T01:00:30+03:00
+# @Last modified time: 2019-05-24T11:26:57+03:00
 from imageai.Prediction import ImagePrediction
 import os
 import pyrebase
@@ -17,8 +17,8 @@ firebaseConfig = {
 };
 firebase=pyrebase.initialize_app(firebaseConfig)
 storage=firebase.storage()
-storage.child("images/plantImg").download("downloaded.jpg")
-db=firebase.database().child("results")
+
+
 
 prediction = ImagePrediction()
 prediction.setModelTypeAsResNet()
@@ -32,15 +32,17 @@ def swap_character(text):
             a[i]=" "
     return ("".join(a))
 
-#while True:
-dict={}
-predictions, probabilities = prediction.predictImage("downloaded.jpg", result_count=2 )
-for eachPrediction, eachProbability in zip(predictions, probabilities):
-    dict[eachPrediction]=eachProbability
-    print(eachPrediction,":",eachProbability)
+while True:
+    db=firebase.database().child("results")
+    storage.child("images/plantImg").download("downloaded.jpg")
+    dict={}
+    predictions, probabilities = prediction.predictImage("downloaded.jpg", result_count=2 )
+    for eachPrediction, eachProbability in zip(predictions, probabilities):
+        dict[eachPrediction]=eachProbability
+        print(eachPrediction,":",eachProbability)
 
-mydata=[]
-for x,y in dict.items():
-    data={swap_character(x):("%.2f" % y)}
-    mydata.append(data)
-db.set(mydata)
+    mydata=[]
+    for x,y in dict.items():
+        data={swap_character(x):("%.2f" % y)}
+        mydata.append(data)
+    db.set(mydata)
